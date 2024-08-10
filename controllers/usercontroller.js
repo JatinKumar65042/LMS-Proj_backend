@@ -1,7 +1,8 @@
 import upload from "../middlewares/multer.middleware.js";
 import User from "../models/user.model.js";
 import AppError from "../utils/error.util.js";
-import cloudinary from "cloudinary"
+import cloudinary from "cloudinary";
+import bcrypt from 'bcryptjs';
 import fs from "fs/promises"
 
 const cookieOptions={
@@ -87,7 +88,7 @@ const login=async (req,res,next)=>{
     }
 
     const user= await User.findOne({email}).select('+password');
-    if(!user || !user.comparePassword(password)){
+    if(!user || !(await bcrypt.compare(password,user.password))){
         return next(new AppError("Email or password does not match",400))
     }
 
